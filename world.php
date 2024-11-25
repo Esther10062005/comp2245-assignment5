@@ -7,41 +7,55 @@ $dbname = 'world';
 try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
 } catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage()); // Stop the script if connection fails
+    die("Connection failed: " . $e->getMessage());
 }
 
-// Retrieve and sanitize the country input
+// Retrieve input parameters
 $country = $_GET['country'] ?? '';
-$country = htmlspecialchars($country, ENT_QUOTES, 'UTF-8');
+$lookup = $_GET['lookup'] ?? 'countries';
 
-// Prepare the query to fetch Country Name and Continent
-$query = "SELECT name, continent FROM countries WHERE name LIKE :country";
+// Define queries based on the lookup type
+if ($lookup === 'cities') {
+    $query = "SELECT cities.name, cities.district, cities.population 
+              FROM cities 
+              JOIN countries ON cities.country_code = countries.code 
+              WHERE countries.name LIKE :country";
+} else {
+    $query = "SELECT name, continent, independence_year, head_of_state 
+              FROM countries 
+              WHERE name LIKE :country";
+}
 
+// Prepare and execute the query
 $stmt = $conn->prepare($query);
-$stmt->execute(['country' => "%$country%"]); // Execute the query with the input
+$stmt->execute(['country' => "%$country%"]);
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Generate the HTML table
-if ($results): // Check if results are not empty
+// Output the results in an HTML table
 ?>
 <table>
     <thead>
         <tr>
-            <th>Country Name</th>
-            <th>Continent</th>
+            <?php if ($lookup === 'cities'): ?>
+                <th>Name</th>
+                <th>District</th>
+                <th>Population</th>
+            <?php else: ?>
+                <th>Country Name</th>
+                <th>Continent</th>
+                <th>Independence Year</th>
+                <th>Head of State</th>
+            <?php endif; ?>
         </tr>
     </thead>
     <tbody>
         <?php foreach ($results as $row): ?>
             <tr>
-                <td><?= htmlspecialchars($row['name']) ?></td>
-                <td><?= htmlspecialchars($row['continent']) ?></td>
+                <?php foreach ($row as $value): ?>
+                    <td><?= htmlspecialchars($value) ?></td> <!-- Escape for security -->
+                <?php endforeach; ?>
             </tr>
         <?php endforeach; ?>
     </tbody>
 </table>
-<?php
-else:
-    echo "<p>No countries match your search.</p>";
-endif;
-?>
+

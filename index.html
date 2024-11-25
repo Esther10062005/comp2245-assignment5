@@ -3,25 +3,21 @@
 <head>
     <meta charset="utf-8">
     <title>World Database Lookup</title>
-
-    <!-- CSS for styling -->
     <link href="world.css" type="text/css" rel="stylesheet" />
-
-    <!-- JavaScript for functionality -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Add jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(() => {
-            // When the "Lookup" button is clicked
-            $('#lookup').click(() => {
+            // Function to handle AJAX requests
+            function fetchResults(lookupType) {
                 const country = $('#country').val().trim(); // Get the input value
                 if (country) {
-                    // Perform an AJAX request to the PHP script
+                    // Perform an AJAX request
                     $.ajax({
                         url: 'world.php',
                         type: 'GET',
-                        data: { country: country }, // Send the country name as a parameter
+                        data: { country: country, lookup: lookupType }, // Send the query parameters
                         success: (response) => {
-                            $('#result').html(response); // Populate the result div with the response
+                            $('#result').html(response); // Update the result div
                         },
                         error: () => {
                             $('#result').html('<p>Error fetching data. Please try again.</p>');
@@ -30,25 +26,29 @@
                 } else {
                     alert('Please enter a country name.');
                 }
-            });
+            }
+
+            // Event listener for "Lookup" button
+            $('#lookup').click(() => fetchResults('countries'));
+
+            // Event listener for "Lookup Cities" button
+            $('#lookupCities').click(() => fetchResults('cities'));
         });
     </script>
 </head>
-
 <body>
     <header>
         <h1>World Database Lookup</h1>
     </header>
-
     <main>
         <div id="controls">
             <label for="country">Country:</label>
             <input id="country" type="search" name="country" placeholder="Enter country name" />
             <button id="lookup">Lookup</button>
+            <button id="lookupCities">Lookup Cities</button> <!-- New button -->
         </div>
-
         <div id="result">
-            <!-- countries will appear here -->
+            <!-- countries or cities will appear here -->
         </div>
     </main>
 </body>
