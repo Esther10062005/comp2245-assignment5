@@ -1,36 +1,57 @@
 <?php
-// Database connection
 $host = 'localhost';
+$username = 'lab5_user';
+$password = 'password123';
 $dbname = 'world';
-$username = 'root';
-$password = '';
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
 } catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+    die("Connection failed: " . $e->getMessage()); // Use die for immediate script termination if connection fails
 }
 
-// Get the country parameter from the GET request
-$country = isset($_GET['country']) ? $_GET['country'] : '';
+// Get sanitized input values
+$country = $_GET['country'] ?? '';
+$lookup = $_GET['lookup'] ?? 'countries';
 
-// SQL query to fetch countries using the LIKE operator for partial matching
-$query = "SELECT * FROM countries WHERE name LIKE :country";
-$stmt = $pdo->prepare($query);
-$stmt->execute(['country' => "%$country%"]);
+// Define query based on lookup type
+$query = $lookup === 'cities'
+    ? "SELECT cities.name, cities.district, cities.population 
+       FROM cities 
+       JOIN countries ON cities.country_code = countries.code 
+       WHERE countries.name LIKE :country"
+    : "SELECT name, continent, independence_year, head_of_state 
+       FROM countries 
+       WHERE name LIKE :country";
 
-// Fetch results from the query
+$stmt = $conn->prepare($query);
+$stmt->execute(['country' => "%$country%"]); // Bind the country parameter for security
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Display the results
-if (count($results) > 0) {
-    foreach ($results as $row) {
-        echo "<p><strong>Country:</strong> {$row['name']}<br>";
-        echo "<strong>Region:</strong> {$row['region']}<br>";
-        echo "<strong>Population:</strong> {$row['population']}</p>";
-    }
-} else {
-    echo "<p>No countries found matching '$country'.</p>";
-}
 ?>
+
+<table>
+    <thead>
+        <tr>
+            <?php if ($lookup === 'cities'): ?>
+                <th>Name</th>
+                <th>District</th>
+                <th>Population</th>
+            <?php else: ?>
+                <th>Country Name</th>
+                <th>Continent</th>
+                <th>Independence Year</th>
+                <th>Head of State</th>
+            <?php endif; ?>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($results as $row): ?>
+            <tr>
+                <?php foreach ($row as $value): ?>
+                    <td><?= htmlspecialchars($value) ?></td> <!-- Escape output for security -->
+                <?php endforeach; ?>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+s

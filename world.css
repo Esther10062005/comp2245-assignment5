@@ -1,22 +1,56 @@
-/* Add your own styles */
+/* Global styles */
 body {
     font-family: Arial, sans-serif;
-    margin: 20px;
+    background-color:  hsl(301, 74%, 42%);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* Header */
+header {
+    background-color: hsl(245, 88%, 46%);
+    color:  hsl(301, 74%, 42%);
     padding: 20px;
-    background-color: #f9f9f9;
+    font-size: 24px;
 }
 
-h1 {
-    color: #e30c0c;
+/* Main content */
+main {
+    margin: 20px auto;
+    max-width: 600px;
 }
 
-#querySelector {
+/* Form input and button */
+input {
+    padding: 10px;
+    width: 70%;
     margin: 10px 0;
 }
 
-#results {
-    margin-top: 20px;
-    padding: 10px;
-    border: 1px solid #141dca;
-    background-color: #fff;
+button {
+    padding: 10px 20px;
+    background-color: hsl(301, 74%, 42%);
+    color: rgb(149, 51, 51);
+    border: none;
+    cursor: pointer;
 }
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid hsl(226, 90%, 27%);
+    padding: 8px;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+
+
