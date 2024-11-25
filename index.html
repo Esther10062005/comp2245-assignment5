@@ -1,32 +1,55 @@
 <!DOCTYPE html>
 <html>
-	<head>
-        <meta charset="utf-8">
-		<title>World Database Lookup</title>
+<head>
+    <meta charset="utf-8">
+    <title>World Database Lookup</title>
 
-		<!-- you can modify this as needed or to your preference -->
-		<link href="world.css" type="text/css" rel="stylesheet" />
+    <!-- CSS for styling -->
+    <link href="world.css" type="text/css" rel="stylesheet" />
 
-		<!-- you write this -->
-		<script src="world.js" type="text/javascript"></script>
-	</head>
+    <!-- JavaScript for functionality -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Add jQuery -->
+    <script>
+        $(document).ready(() => {
+            // When the "Lookup" button is clicked
+            $('#lookup').click(() => {
+                const country = $('#country').val().trim(); // Get the input value
+                if (country) {
+                    // Perform an AJAX request to the PHP script
+                    $.ajax({
+                        url: 'world.php',
+                        type: 'GET',
+                        data: { country: country }, // Send the country name as a parameter
+                        success: (response) => {
+                            $('#result').html(response); // Populate the result div with the response
+                        },
+                        error: () => {
+                            $('#result').html('<p>Error fetching data. Please try again.</p>');
+                        }
+                    });
+                } else {
+                    alert('Please enter a country name.');
+                }
+            });
+        });
+    </script>
+</head>
 
-	<body>
-		<header>
-			<h1>World Database Lookup</h1>
-		</header>
+<body>
+    <header>
+        <h1>World Database Lookup</h1>
+    </header>
 
-		<main>
-			<div id="controls">
-				<label for="country">Country:</label>
-				<input id="country" type="search" name="country" placeholder="Enter country name" />
-				<button id="lookup">Lookup</button>
-			</div>
-			
-			<div id="result">
-				<!-- countries will appear here -->
-			</div>
-		</main>
+    <main>
+        <div id="controls">
+            <label for="country">Country:</label>
+            <input id="country" type="search" name="country" placeholder="Enter country name" />
+            <button id="lookup">Lookup</button>
+        </div>
 
-	</body>
+        <div id="result">
+            <!-- countries will appear here -->
+        </div>
+    </main>
+</body>
 </html>
